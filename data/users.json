@@ -1,0 +1,33 @@
+{
+  "valid_users": [
+    {
+      "username": "standard_user",
+      "password": "secret_sauce",
+      "description": "Standard user with full access to all features"
+    },
+    {
+      "username": "performance_glitch_user",
+      "password": "secret_sauce",
+      "description": "User that triggers intentional performance delays in the app"
+    }
+  ],
+  "invalid_users": [
+    {
+      "username": "wrong_user",
+      "password": "wrong_pass",
+      "description": "Completely wrong credentials — should show error message"
+    },
+    {
+      "username": "standard_user",
+      "password": "wrong_pass",
+      "description": "Correct username, wrong password — should show error message"
+    }
+  ],
+  "locked_users": [
+    {
+      "username": "locked_out_user",
+      "password": "secret_sauce",
+      "description": "Account locked by admin — should show locked-out error message"
+    }
+  ]
+}

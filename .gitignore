@@ -1,0 +1,19 @@
+# Virtual environment — never commit this folder
+.venv/
+
+# pytest cache — generated automatically during test runs
+.pytest_cache/
+
+# Python bytecode cache
+__pycache__/
+*.pyc
+
+# Test reports — generated output, not source code
+reports/
+
+# Playwright browser binaries — too large for a repo, installed via CLI
+playwright-browsers/
+
+# OS files
+.DS_Store
+Thumbs.db

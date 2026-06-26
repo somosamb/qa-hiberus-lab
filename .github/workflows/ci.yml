@@ -1,0 +1,103 @@
+# ---------------------------------------------------------------------------
+# .github/workflows/ci.yml
+#
+# GitHub Actions CI/CD pipeline for qa-hiberus-lab.
+#
+# WHAT IS THIS?
+# GitHub Actions is a CI/CD platform built into GitHub. This file defines
+# a "workflow" — a set of automated steps that run in the cloud whenever
+# a specific event occurs (e.g. a push or pull request to main).
+#
+# WHY CI/CD FOR QA?
+# Running tests automatically on every code change means:
+#   - Regressions are caught immediately, not at the end of a sprint
+#   - Every team member can see test results without running locally
+#   - The pipeline acts as a quality gate before merging code
+#
+# PHASE 3 of the learning plan.
+# ---------------------------------------------------------------------------
+
+# The name of this workflow — displayed in the GitHub Actions UI
+name: QA Test Suite
+
+# ---------------------------------------------------------------------------
+# TRIGGER: on
+#
+# Defines the GitHub events that will start this workflow.
+# ---------------------------------------------------------------------------
+on:
+  # Run on every push to the main branch
+  push:
+    branches:
+      - main
+
+  # Run on every pull request targeting main
+  pull_request:
+    branches:
+      - main
+
+# ---------------------------------------------------------------------------
+# JOBS
+#
+# A workflow is made of one or more jobs.
+# Jobs run in parallel by default. Here we have a single job: "test".
+# ---------------------------------------------------------------------------
+jobs:
+  test:
+    # The type of virtual machine GitHub will use to run this job.
+    # ubuntu-latest is the standard choice for Python/Playwright projects.
+    runs-on: ubuntu-latest
+
+    # ------------------------------------------------------------------
+    # STEPS
+    #
+    # Steps run sequentially inside the job.
+    # Each step is either a shell command (run) or a reusable action (uses).
+    # ------------------------------------------------------------------
+    steps:
+
+      # Step 1: Check out the repository code onto the runner machine.
+      # Without this step, the runner has no access to our files.
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Step 2: Install the specified Python version on the runner.
+      # We pin to 3.12 for stability — compatible with all our dependencies.
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # Step 3: Install all Python packages listed in requirements.txt.
+      # --no-cache-dir avoids stale cached packages on the runner.
+      - name: Install Python dependencies
+        run: pip install --no-cache-dir -r requirements.txt
+
+      # Step 4: Download the Playwright browser binaries.
+      # Playwright needs Chromium, Firefox, and WebKit installed separately
+      # from the Python package itself. --with-deps installs OS-level
+      # dependencies (fonts, codecs, etc.) needed by the browsers.
+      - name: Install Playwright browsers
+        run: playwright install --with-deps
+
+      # Step 5: Run the test suite.
+      # --headless is the default in CI (no display server available).
+      # --html writes the report to reports/report.html.
+      # --self-contained-html bundles CSS/JS into the single HTML file.
+      # -v enables verbose output so each test name is shown in the log.
+      - name: Run pytest
+        run: |
+          mkdir -p reports
+          pytest -v --html=reports/report.html --self-contained-html
+
+      # Step 6: Upload the HTML report as a downloadable artifact.
+      # After the pipeline runs, the report is available in the
+      # GitHub Actions UI under "Artifacts" for 30 days.
+      - name: Upload test report
+        # always() ensures the report is uploaded even if tests fail —
+        # we still want to see which tests failed and why.
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-report
+          path: reports/report.html
