@@ -11,16 +11,14 @@
 # compatible with Playwright's Chromium driver.
 # ---------------------------------------------------------------------------
 
+import os
 import json
 import pytest
 from playwright.sync_api import sync_playwright
 
-# ---------------------------------------------------------------------------
-# PATH TO BRAVE BROWSER
-#
-# Module-level constant — easy to update if Brave moves to a different path.
-# ---------------------------------------------------------------------------
-BRAVE_PATH = "/usr/bin/brave-browser"
+# None means Playwright uses its own bundled Chromium (CI default).
+# Set PLAYWRIGHT_BROWSER_PATH=/usr/bin/brave-browser locally to use Brave.
+BROWSER_PATH = os.environ.get("PLAYWRIGHT_BROWSER_PATH") or None
 
 
 # ---------------------------------------------------------------------------
@@ -37,10 +35,11 @@ def browser():
     # sync_playwright() starts the Playwright engine as a context manager
     with sync_playwright() as pw:
         # launch() starts the browser process
-        # executable_path overrides the default bundled binary with Brave
+        # executable_path is None in CI (uses bundled Chromium) or set via
+        # PLAYWRIGHT_BROWSER_PATH env var locally to use Brave
         # headless=True runs without a visible window (standard for CI)
         browser = pw.chromium.launch(
-            executable_path=BRAVE_PATH,
+            executable_path=BROWSER_PATH,
             headless=True,
         )
 
