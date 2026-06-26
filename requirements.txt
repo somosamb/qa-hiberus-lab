@@ -1,27 +1,4 @@
-# ---------------------------------------------------------------------------
-# requirements.txt
-# All dependencies for the qa-hiberus-lab project.
-# Install with: pip install -r requirements.txt
-# ---------------------------------------------------------------------------
-
-# pytest: the test runner. Discovers test files (test_*.py), runs them,
-# and provides the assert mechanism and fixture system.
-pytest==9.1.1
-
-# playwright: the browser automation library. Controls Chromium, Firefox,
-# and WebKit via a single Python API.
-# NOTE: pinned to 1.60.0 — latest pre-release with Python 3.14 support.
-playwright==1.60.0
-
-# pytest-playwright: official Playwright plugin for pytest.
-# Provides ready-made fixtures like `page`, `browser`, `playwright`,
-# and CLI options like --browser, --headed, --slowmo.
-pytest-playwright==0.8.0
-
-# requests: HTTP client library used for API testing (reqres.in).
-# Simple, human-friendly interface for GET, POST, PUT, DELETE requests.
-requests==2.34.2
-
-# pytest-html: generates a self-contained HTML report of the test run.
-# Used in the CI/CD pipeline to produce a downloadable artifact.
-pytest-html==4.2.0
+selenium
+pytest
+webdriver-manager
+pytest-html
