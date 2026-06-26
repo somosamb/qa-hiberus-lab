@@ -14,6 +14,9 @@ reports/
 # Playwright browser binaries — too large for a repo, installed via CLI
 playwright-browsers/
 
+# Private AI agent notes — not for version control
+Memories.md
+
 # OS files
 .DS_Store
 Thumbs.db
