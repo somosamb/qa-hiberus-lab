@@ -45,15 +45,9 @@ on:
 jobs:
   test:
     # The type of virtual machine GitHub will use to run this job.
-    # ubuntu-latest is the standard choice for Python/Playwright projects.
+    # ubuntu-latest is the standard choice for Python/Selenium projects.
     runs-on: ubuntu-latest
 
-    # ------------------------------------------------------------------
-    # STEPS
-    #
-    # Steps run sequentially inside the job.
-    # Each step is either a shell command (run) or a reusable action (uses).
-    # ------------------------------------------------------------------
     steps:
 
       # Step 1: Check out the repository code onto the runner machine.
@@ -68,27 +62,29 @@ jobs:
         with:
           python-version: "3.12"
 
-      # Step 3: Install all Python packages listed in requirements.txt.
+      # Step 3: Install Chromium and its dependencies.
+      # GitHub's ubuntu-latest runner does not ship with a browser binary.
+      # chromium-browser provides the binary that Selenium will drive.
+      - name: Install Chromium
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y chromium-browser
+
+      # Step 4: Install all Python packages listed in requirements.txt.
       # --no-cache-dir avoids stale cached packages on the runner.
       - name: Install Python dependencies
-        run: pip install --no-cache-dir -r requirements.txt
-
-      # Step 4: Download the Playwright browser binaries.
-      # Playwright needs Chromium, Firefox, and WebKit installed separately
-      # from the Python package itself. --with-deps installs OS-level
-      # dependencies (fonts, codecs, etc.) needed by the browsers.
-      - name: Install Playwright browsers
-        run: playwright install --with-deps
+        run: pip install --no-cache-dir -r Sauce-Demo-Login/requirements.txt
 
       # Step 5: Run the test suite.
-      # --headless is the default in CI (no display server available).
+      # Headless mode is handled inside conftest.py via Chrome options.
       # --html writes the report to reports/report.html.
       # --self-contained-html bundles CSS/JS into the single HTML file.
       # -v enables verbose output so each test name is shown in the log.
       - name: Run pytest
+        working-directory: Sauce-Demo-Login
         run: |
           mkdir -p reports
-          pytest -v --html=reports/report.html --self-contained-html
+          pytest tests/test_login.py -v --html=reports/report.html --self-contained-html
 
       # Step 6: Upload the HTML report as a downloadable artifact.
       # After the pipeline runs, the report is available in the
@@ -100,4 +96,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: test-report
-          path: reports/report.html
+          path: Sauce-Demo-Login/reports/report.html
