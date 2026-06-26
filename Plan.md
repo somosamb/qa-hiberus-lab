@@ -53,10 +53,12 @@ qa-hiberus-lab/
 │   └── workflows/
 │       └── ci.yml              # CI/CD pipeline — GitHub Actions
 ├── pages/                      # Page Object Model (POM) layer
+│   ├── __init__.py
 │   ├── login_page.py           # Login page interactions
 │   ├── inventory_page.py       # Product inventory page
 │   └── cart_page.py            # Shopping cart page
 ├── tests/
+│   ├── __init__.py
 │   ├── test_login.py           # Login flow tests (valid, invalid, locked user)
 │   ├── test_inventory.py       # UI, sorting, add-to-cart tests
 │   ├── test_cart.py            # End-to-end cart validation
@@ -64,6 +66,7 @@ qa-hiberus-lab/
 ├── data/
 │   └── users.json              # Data-driven test users (arrays, maps)
 ├── conftest.py                 # pytest fixtures: browser, page, base_url
+├── pytest.ini                  # pytest configuration
 ├── requirements.txt            # Python dependencies
 ├── Plan.md                     # This file
 └── README.md                   # Setup, usage, and learning guide

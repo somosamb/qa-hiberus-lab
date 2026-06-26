@@ -5,15 +5,35 @@
 # Defines shared fixtures (reusable setup/teardown) available to all tests.
 #
 # BROWSER NOTE:
-# Playwright bundles its own browser binaries, but on Ubuntu 26.04 those
-# binaries are not yet supported. We work around this by pointing Playwright
-# to the system-installed Brave browser, which is Chromium-based and fully
-# compatible with Playwright's Chromium driver.
+# Locally (Ubuntu 26.04): Playwright's bundled binaries are not yet supported.
+# We work around this by setting the PLAYWRIGHT_BROWSER_PATH environment variable
+# to point to the system-installed Brave browser, which is Chromium-based and
+# fully compatible with Playwright's Chromium driver.
+#
+# In CI (GitHub Actions): PLAYWRIGHT_BROWSER_PATH is not set, so BROWSER_PATH
+# falls back to None and Playwright uses its own bundled Chromium as normal.
+# The Brave workaround is local-only and has no effect on the pipeline.
 # ---------------------------------------------------------------------------
 
+# os is a built-in Python module (no install needed) that lets your code talk to the
+# operating system. Here we use it to read environment variables — system-level
+# settings stored outside the code, like PLAYWRIGHT_BROWSER_PATH.
 import os
+
+# json is a built-in Python module for reading and writing JSON files.
+# JSON is a common format for storing structured data (like test users).
+# json.load() converts a .json file into a Python dict or list automatically.
 import json
+
+# pytest is the test framework that discovers, runs, and reports your tests.
+# It also provides @pytest.fixture — a way to define reusable setup/teardown
+# logic that tests can request just by naming it as a parameter.
 import pytest
+
+# sync_playwright is the entry point to the Playwright library.
+# It starts the Playwright engine and gives access to browser types
+# (Chromium, Firefox, WebKit). "sync" means it runs synchronously —
+# one action at a time, which is simpler to read and debug than async code.
 from playwright.sync_api import sync_playwright
 
 # None means Playwright uses its own bundled Chromium (CI default).

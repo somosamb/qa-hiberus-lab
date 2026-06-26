@@ -19,7 +19,7 @@ project, targeting the Hiberus Automation Engineer Senior role requirements.
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/<your-username>/qa-hiberus-lab.git
+git clone https://github.com/somosamb/qa-hiberus-lab.git
 cd qa-hiberus-lab
 ```
 
@@ -103,10 +103,12 @@ qa-hiberus-lab/
 │   └── workflows/
 │       └── ci.yml              # GitHub Actions CI/CD pipeline
 ├── pages/                      # Page Object Model (POM) layer
+│   ├── __init__.py
 │   ├── login_page.py           # Encapsulates login page actions and locators
 │   ├── inventory_page.py       # Encapsulates inventory/product page behaviour
 │   └── cart_page.py            # Encapsulates shopping cart page behaviour
 ├── tests/
+│   ├── __init__.py
 │   ├── test_login.py           # Login flow scenarios
 │   ├── test_inventory.py       # Product listing, sorting, add-to-cart
 │   ├── test_cart.py            # End-to-end cart and checkout validation
@@ -114,6 +116,7 @@ qa-hiberus-lab/
 ├── data/
 │   └── users.json              # Test user data for data-driven tests
 ├── conftest.py                 # Shared pytest fixtures (browser, page, base_url)
+├── pytest.ini                  # pytest configuration
 ├── requirements.txt            # All Python dependencies with pinned versions
 ├── Plan.md                     # Full learning plan and gap analysis
 └── README.md                   # This file
