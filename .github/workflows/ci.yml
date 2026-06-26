@@ -17,34 +17,18 @@
 # PHASE 3 of the learning plan.
 # ---------------------------------------------------------------------------
 
-# The name of this workflow — displayed in the GitHub Actions UI
 name: QA Test Suite
 
-# ---------------------------------------------------------------------------
-# TRIGGER: on
-#
-# Defines the GitHub events that will start this workflow.
-# ---------------------------------------------------------------------------
 on:
-  # Run on every push to the main branch
   push:
     branches:
       - main
-
-  # Run on every pull request targeting main
   pull_request:
     branches:
       - main
 
-# ---------------------------------------------------------------------------
-# JOBS
-#
-# A workflow is made of one or more jobs.
-# Jobs run in parallel by default. Here we have a single job: "test".
-# ---------------------------------------------------------------------------
 jobs:
   test:
-    # The type of virtual machine GitHub will use to run this job.
     # ubuntu-latest is the standard choice for Python/Selenium projects.
     runs-on: ubuntu-latest
 
@@ -73,7 +57,7 @@ jobs:
       # Step 4: Install all Python packages listed in requirements.txt.
       # --no-cache-dir avoids stale cached packages on the runner.
       - name: Install Python dependencies
-        run: pip install --no-cache-dir -r Sauce-Demo-Login/requirements.txt
+        run: pip install --no-cache-dir -r requirements.txt
 
       # Step 5: Run the test suite.
       # Headless mode is handled inside conftest.py via Chrome options.
@@ -81,7 +65,6 @@ jobs:
       # --self-contained-html bundles CSS/JS into the single HTML file.
       # -v enables verbose output so each test name is shown in the log.
       - name: Run pytest
-        working-directory: Sauce-Demo-Login
         run: |
           mkdir -p reports
           pytest tests/test_login.py -v --html=reports/report.html --self-contained-html
@@ -96,4 +79,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: test-report
-          path: Sauce-Demo-Login/reports/report.html
+          path: reports/report.html
