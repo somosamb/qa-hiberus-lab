@@ -48,28 +48,42 @@ BROWSER_PATH = os.environ.get("PLAYWRIGHT_BROWSER_PATH") or None
 # use Playwright's bundled binaries. We override it here to launch Brave
 # instead via `executable_path`.
 #
+# This fixture also reads two CLI options from the pytest command line:
+#   --headed   → opens a visible browser window so you can watch the test run
+#   --slowmo   → adds a delay in milliseconds between every browser action,
+#                making it easier to follow what is happening visually
+#
+# Both options are handled by pytestconfig, which is a special pytest object
+# that gives fixtures access to all command-line options and configuration.
+#
 # Scope "session" — one browser instance shared across the whole test run.
 # ---------------------------------------------------------------------------
 @pytest.fixture(scope="session")
 def browser(pytestconfig):
-    # pytestconfig gives access to all CLI options passed to pytest.
-    # getoption("headed") returns True if --headed was passed, False otherwise.
-    # We invert it: headed=True means headless=False (visible window).
+    # pytestconfig is a built-in pytest object automatically injected when
+    # declared as a parameter. It holds all CLI flags and pytest.ini settings.
+    # getoption() reads a specific CLI option by name.
+    # default= is the fallback value when the option is not passed.
     headed = pytestconfig.getoption("headed", default=False)
+
+    # --headed means the user wants to SEE the browser.
+    # Playwright's launch() expects headless= not headed=, so we invert:
+    #   --headed passed  → headed=True  → headless=False → visible window
+    #   --headed absent  → headed=False → headless=True  → no window (CI default)
     headless = not headed
 
-    # slowmo adds a delay (in ms) between every Playwright action.
-    # Useful for watching tests run in slow motion with --headed.
-    # Defaults to 0 (no delay) if --slowmo is not passed.
+    # --slowmo accepts a number in milliseconds.
+    # Playwright will pause that many ms between every action (click, fill, etc).
+    # Example: --slowmo 1000 = 1 second pause between each step.
+    # Default is 0 = no delay, runs at full speed.
     slowmo = pytestconfig.getoption("slowmo", default=0)
 
     # sync_playwright() starts the Playwright engine as a context manager
     with sync_playwright() as pw:
-        # launch() starts the browser process
-        # executable_path is None in CI (uses bundled Chromium) or set via
-        # PLAYWRIGHT_BROWSER_PATH env var locally to use Brave
-        # headless is now dynamic: False when --headed is passed, True otherwise
-        # slow_mo applies a delay in ms between every action
+        # launch() starts the actual browser process.
+        # executable_path: None in CI (bundled Chromium) or Brave locally.
+        # headless: controls whether the browser window is visible or not.
+        # slow_mo: delay in ms applied between every browser action globally.
         browser = pw.chromium.launch(
             executable_path=BROWSER_PATH,
             headless=headless,
