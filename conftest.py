@@ -51,16 +51,29 @@ BROWSER_PATH = os.environ.get("PLAYWRIGHT_BROWSER_PATH") or None
 # Scope "session" — one browser instance shared across the whole test run.
 # ---------------------------------------------------------------------------
 @pytest.fixture(scope="session")
-def browser():
+def browser(pytestconfig):
+    # pytestconfig gives access to all CLI options passed to pytest.
+    # getoption("headed") returns True if --headed was passed, False otherwise.
+    # We invert it: headed=True means headless=False (visible window).
+    headed = pytestconfig.getoption("headed", default=False)
+    headless = not headed
+
+    # slowmo adds a delay (in ms) between every Playwright action.
+    # Useful for watching tests run in slow motion with --headed.
+    # Defaults to 0 (no delay) if --slowmo is not passed.
+    slowmo = pytestconfig.getoption("slowmo", default=0)
+
     # sync_playwright() starts the Playwright engine as a context manager
     with sync_playwright() as pw:
         # launch() starts the browser process
         # executable_path is None in CI (uses bundled Chromium) or set via
         # PLAYWRIGHT_BROWSER_PATH env var locally to use Brave
-        # headless=True runs without a visible window (standard for CI)
+        # headless is now dynamic: False when --headed is passed, True otherwise
+        # slow_mo applies a delay in ms between every action
         browser = pw.chromium.launch(
             executable_path=BROWSER_PATH,
-            headless=True,
+            headless=headless,
+            slow_mo=slowmo,
         )
 
         # yield hands the browser object to tests that request this fixture

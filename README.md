@@ -93,6 +93,13 @@ pytest --html=reports/report.html --self-contained-html
 pytest --headed
 ```
 
+### Run tests in headed mode with slow motion
+
+```bash
+# 1000 = 1 second delay between every action — useful for visual debugging
+pytest --headed --slowmo 1000
+```
+
 ---
 
 ## Project Structure

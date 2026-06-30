@@ -10,6 +10,7 @@ __pycache__/
 
 # Test reports — generated output, not source code
 reports/
+resources/
 
 # Playwright browser binaries — too large for a repo, installed via CLI
 playwright-browsers/
