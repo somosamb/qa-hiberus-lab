@@ -31,6 +31,7 @@ from pages.inventory_page import InventoryPage
 #   - base_url: defined in conftest.py, returns "https://www.saucedemo.com"
 #   - valid_user: defined in conftest.py, returns the first user from users.json
 # ---------------------------------------------------------------------------
+@pytest.mark.smoke
 def test_valid_login(page, base_url, valid_user):
     # Instantiate the LoginPage POM — we pass the Playwright page object
     login_page = LoginPage(page)
@@ -88,6 +89,7 @@ def test_valid_login(page, base_url, valid_user):
         "Epic sadface: Password is required"
     ),
 ])
+@pytest.mark.smoke
 def test_invalid_login(page, base_url, username, password, expected_error):
     login_page = LoginPage(page)
     login_page.navigate(base_url)
@@ -119,6 +121,7 @@ def test_invalid_login(page, base_url, username, password, expected_error):
 # This is a separate test (not parametrized with invalid_login) because
 # it represents a distinct business scenario: account locked by admin.
 # ---------------------------------------------------------------------------
+@pytest.mark.smoke
 def test_locked_out_user(page, base_url, users):
     # We use the 'users' fixture (full dict) to access locked_users
     locked_user = users["locked_users"][0]

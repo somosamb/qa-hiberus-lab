@@ -103,6 +103,15 @@ def browser(pytestconfig):
 # We override pytest-playwright's built-in `page` fixture so it uses our
 # Brave-backed `browser` fixture above instead of the bundled one.
 #
+# WHY OVERRIDE?
+# pytest-playwright provides its own `browser` and `page` fixtures out of
+# the box. However, those built-in fixtures call playwright install binaries
+# directly, bypassing our BROWSER_PATH / executable_path workaround.
+# By defining fixtures with the same names here in conftest.py, pytest
+# automatically uses ours instead — this is called fixture overriding.
+# Our versions are drop-in replacements that add Brave + headed + slowmo
+# support on top of the standard behaviour.
+#
 # Scope "function" (default) — a fresh tab is created for each test,
 # guaranteeing full isolation: cookies, storage, and state are reset.
 # ---------------------------------------------------------------------------

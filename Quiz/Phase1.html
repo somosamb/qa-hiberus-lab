@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Phase 1 Quiz — qa-hiberus-lab</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #0f1117;
+      color: #e0e0e0;
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    header h1 {
+      font-size: 2rem;
+      color: #f0a500;
+      margin-bottom: 8px;
+    }
+
+    header p {
+      color: #888;
+      font-size: 0.95rem;
+    }
+
+    .progress-bar-wrapper {
+      background: #1e2130;
+      border-radius: 8px;
+      height: 8px;
+      margin-bottom: 30px;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: #f0a500;
+      border-radius: 8px;
+      transition: width 0.4s ease;
+      width: 0%;
+    }
+
+    .question-card {
+      background: #1e2130;
+      border: 1px solid #2a2d3e;
+      border-radius: 12px;
+      padding: 28px;
+      margin-bottom: 24px;
+      transition: border-color 0.3s;
+    }
+
+    .question-card.correct  { border-color: #2ecc71; }
+    .question-card.wrong    { border-color: #e74c3c; }
+
+    .question-number {
+      font-size: 0.75rem;
+      color: #f0a500;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+    }
+
+    .question-text {
+      font-size: 1.05rem;
+      line-height: 1.6;
+      margin-bottom: 20px;
+      color: #e0e0e0;
+    }
+
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option {
+      background: #13151f;
+      border: 1px solid #2a2d3e;
+      border-radius: 8px;
+      padding: 12px 16px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 0.95rem;
+      color: #ccc;
+      text-align: left;
+    }
+
+    .option:hover:not(:disabled) {
+      border-color: #f0a500;
+      color: #fff;
+      background: #1a1d2e;
+    }
+
+    .option.selected  { border-color: #f0a500; color: #fff; background: #1a1d2e; }
+    .option.correct   { border-color: #2ecc71; background: #1a2e1e; color: #2ecc71; font-weight: 600; }
+    .option.wrong     { border-color: #e74c3c; background: #2e1a1a; color: #e74c3c; }
+    .option.reveal    { border-color: #2ecc71; background: #1a2e1e; color: #2ecc71; font-weight: 600; }
+    .option:disabled  { cursor: default; }
+
+    .code-block {
+      background: #13151f;
+      border: 1px solid #2a2d3e;
+      border-radius: 6px;
+      padding: 14px 16px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.88rem;
+      color: #a9b7c6;
+      margin-bottom: 18px;
+      white-space: pre;
+      overflow-x: auto;
+    }
+
+    .explanation {
+      display: none;
+      margin-top: 16px;
+      padding: 14px 16px;
+      background: #13151f;
+      border-left: 3px solid #f0a500;
+      border-radius: 0 6px 6px 0;
+      font-size: 0.92rem;
+      line-height: 1.7;
+      color: #bbb;
+    }
+
+    .explanation.show { display: block; }
+    .explanation strong { color: #f0a500; }
+    .explanation code {
+      background: #1e2130;
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-family: 'Courier New', monospace;
+      color: #a9b7c6;
+      font-size: 0.88rem;
+    }
+
+    .result-icon {
+      display: none;
+      float: right;
+      font-size: 1.3rem;
+      margin-top: -2px;
+    }
+    .result-icon.show { display: inline; }
+
+    .btn {
+      display: inline-block;
+      padding: 12px 28px;
+      border-radius: 8px;
+      border: none;
+      font-size: 1rem;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: #f0a500;
+      color: #0f1117;
+    }
+
+    .btn-primary:hover { background: #e09400; }
+    .btn-primary:disabled { background: #555; color: #888; cursor: default; }
+
+    .btn-secondary {
+      background: transparent;
+      color: #f0a500;
+      border: 1px solid #f0a500;
+      margin-left: 12px;
+    }
+
+    .btn-secondary:hover { background: #f0a50015; }
+
+    .actions {
+      text-align: center;
+      margin-top: 32px;
+    }
+
+    .score-board {
+      display: none;
+      background: #1e2130;
+      border: 1px solid #2a2d3e;
+      border-radius: 12px;
+      padding: 36px;
+      text-align: center;
+      margin-top: 40px;
+    }
+
+    .score-board.show { display: block; }
+
+    .score-board h2 {
+      font-size: 1.5rem;
+      color: #f0a500;
+      margin-bottom: 16px;
+    }
+
+    .score-number {
+      font-size: 4rem;
+      font-weight: 700;
+      margin: 16px 0;
+    }
+
+    .score-number.great  { color: #2ecc71; }
+    .score-number.ok     { color: #f0a500; }
+    .score-number.poor   { color: #e74c3c; }
+
+    .score-message {
+      font-size: 1rem;
+      color: #888;
+      margin-bottom: 24px;
+    }
+
+    .score-breakdown {
+      display: flex;
+      justify-content: center;
+      gap: 32px;
+      margin-bottom: 28px;
+    }
+
+    .breakdown-item { text-align: center; }
+    .breakdown-item .label { font-size: 0.8rem; color: #666; text-transform: uppercase; letter-spacing: 1px; }
+    .breakdown-item .value { font-size: 1.6rem; font-weight: 700; margin-top: 4px; }
+    .breakdown-item .value.correct-val { color: #2ecc71; }
+    .breakdown-item .value.wrong-val   { color: #e74c3c; }
+    .breakdown-item .value.total-val   { color: #f0a500; }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <h1>⚗️ Phase 1 Quiz</h1>
+    <p>qa-hiberus-lab · Python + Playwright + pytest foundations</p>
+  </header>
+
+  <div class="progress-bar-wrapper">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+
+  <div id="quizContainer"></div>
+
+  <div class="actions">
+    <button class="btn btn-primary" id="submitBtn" disabled onclick="submitQuiz()">Submit Quiz</button>
+    <button class="btn btn-secondary" id="resetBtn" style="display:none" onclick="resetQuiz()">Try Again</button>
+  </div>
+
+  <div class="score-board" id="scoreBoard">
+    <h2>Quiz Complete</h2>
+    <div class="score-number" id="scoreNumber"></div>
+    <div class="score-message" id="scoreMessage"></div>
+    <div class="score-breakdown">
+      <div class="breakdown-item">
+        <div class="label">Correct</div>
+        <div class="value correct-val" id="correctCount"></div>
+      </div>
+      <div class="breakdown-item">
+        <div class="label">Wrong</div>
+        <div class="value wrong-val" id="wrongCount"></div>
+      </div>
+      <div class="breakdown-item">
+        <div class="label">Total</div>
+        <div class="value total-val" id="totalCount"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const questions = [
+  {
+    question: "What is the purpose of <code>conftest.py</code> in a pytest project?",
+    options: [
+      "It stores test data like usernames and passwords",
+      "It is loaded automatically by pytest and defines shared fixtures available to all tests",
+      "It configures the browser settings only",
+      "It is the main test file that pytest runs first"
+    ],
+    answer: 1,
+    explanation: "<strong>conftest.py</strong> is a special file that pytest discovers and loads automatically before running any test. It is used to define <strong>fixtures</strong> — reusable setup and teardown functions that any test can request just by naming them as parameters. You never import it manually."
+  },
+  {
+    question: "What does the <code>#</code> symbol mean in a Playwright CSS selector like <code>#user-name</code>?",
+    options: [
+      "It is a comment",
+      "It targets an element by its class name",
+      "It targets an element by its ID attribute",
+      "It targets an element by its data attribute"
+    ],
+    answer: 2,
+    explanation: "In CSS selector syntax, <code>#</code> means <strong>ID selector</strong>. So <code>#user-name</code> targets the HTML element that has <code>id=\"user-name\"</code>. This is different from <code>.</code> which targets by class, or <code>[attr]</code> which targets by any attribute."
+  },
+  {
+    question: "What is a <code>.pyc</code> file?",
+    options: [
+      "A Python configuration file you write manually",
+      "A compiled bytecode file Python generates automatically for faster loading",
+      "A pytest cache file storing test results",
+      "A Playwright browser binary"
+    ],
+    answer: 1,
+    explanation: "<strong>.pyc files</strong> are compiled bytecode — Python's intermediate format between your source code and machine execution. Python generates them automatically inside <code>__pycache__/</code> folders. You never write or edit them. They are safe to delete and are excluded from Git via <code>.gitignore</code>."
+  },
+  {
+    question: "What is the purpose of <code>__init__.py</code> inside the <code>pages/</code> and <code>tests/</code> folders?",
+    options: [
+      "It contains the main configuration for the test suite",
+      "It defines which tests to skip",
+      "It marks the directory as a Python package so it can be imported",
+      "It stores browser launch settings"
+    ],
+    answer: 2,
+    explanation: "<strong>__init__.py</strong> marks a directory as a Python package. Without it, Python won't treat the folder as a module and imports will fail. In this project, it allows <code>from pages.login_page import LoginPage</code> to work correctly. The file is usually empty — its presence is what matters."
+  },
+  {
+    question: "In the <code>browser</code> fixture, what does <code>yield browser</code> do?",
+    options: [
+      "It returns the browser and the fixture function ends immediately",
+      "It pauses the fixture, hands the browser to the test, and resumes teardown after the test finishes",
+      "It creates a new browser tab for each test",
+      "It saves the browser state to a file"
+    ],
+    answer: 1,
+    explanation: "<strong>yield</strong> splits a fixture into two phases. Everything <em>before</em> yield is setup (runs before the test). Everything <em>after</em> yield is teardown (runs after the test). The value passed to yield is what the test receives. This is how <code>browser.close()</code> can run as cleanup after all tests finish."
+  },
+  {
+    question: "What does <code>scope=\"session\"</code> mean on a pytest fixture?",
+    options: [
+      "The fixture runs once per test function",
+      "The fixture runs once per test file",
+      "The fixture runs once for the entire test run and is shared across all tests",
+      "The fixture only runs in CI pipelines"
+    ],
+    answer: 2,
+    explanation: "<strong>scope=\"session\"</strong> means the fixture is created <em>once</em> at the start of the test run and shared across every test. This is used for expensive setup like launching a browser. Compare with the default scope <strong>function</strong>, which creates a fresh instance for each individual test."
+  },
+  {
+    question: "What is the Page Object Model (POM)?",
+    options: [
+      "A design pattern where each page of the app is represented by a class that owns its locators and actions",
+      "A Playwright built-in feature that auto-generates test code",
+      "A JSON file that stores all page URLs",
+      "A pytest plugin for generating HTML reports"
+    ],
+    answer: 0,
+    explanation: "<strong>POM</strong> is a design pattern where each page of the application has its own Python class. The class owns all <strong>locators</strong> (CSS selectors) and all <strong>actions</strong> (fill, click, navigate). Tests never interact with the browser directly — they call methods on page classes. If a locator changes, you fix it in one place only."
+  },
+  {
+    question: "What does <code>data-test=\"error\"</code> represent in the SauceDemo HTML?",
+    options: [
+      "A built-in HTML attribute that marks error elements",
+      "A CSS class added by the browser automatically",
+      "A custom attribute added by developers as a stable hook for test automation",
+      "A Playwright internal selector"
+    ],
+    answer: 2,
+    explanation: "<strong>data-*</strong> attributes are custom HTML attributes that start with <code>data-</code>. Browsers ignore them completely. Developers add them specifically as stable targets for QA automation. They are preferred over IDs and classes because those often change for styling reasons, while <code>data-test</code> attributes are added purely for testing."
+  },
+  {
+    question: "What does <code>pytestconfig.getoption(\"headed\", default=False)</code> do?",
+    options: [
+      "It reads the PLAYWRIGHT_BROWSER_PATH environment variable",
+      "It reads the --headed CLI flag passed to pytest, returning False if not provided",
+      "It sets the browser to headless mode by default",
+      "It checks if the test is running in CI"
+    ],
+    answer: 1,
+    explanation: "<strong>pytestconfig</strong> is a special pytest object that gives fixtures access to all command-line options. <code>getoption(\"headed\")</code> reads the <code>--headed</code> flag. If the user ran <code>pytest --headed</code>, it returns <code>True</code>. If not passed, it returns the <code>default</code> value — <code>False</code> in this case, meaning headless mode."
+  },
+  {
+    question: "Look at this code. What does <code>self.page = page</code> do inside <code>__init__</code>?",
+    code: `class LoginPage:\n    def __init__(self, page):\n        self.page = page\n\n    def click_login(self):\n        self.page.click(self.LOGIN_BUTTON)`,
+    options: [
+      "It creates a new browser tab",
+      "It stores the Playwright page object as an instance attribute so all methods in the class can use it",
+      "It navigates to the login URL",
+      "It copies the page object to a global variable"
+    ],
+    answer: 1,
+    explanation: "<strong>self.page = page</strong> attaches the incoming <code>page</code> parameter to the object instance. <strong>self</strong> refers to the object itself. Without this line, <code>click_login()</code> and every other method would have no access to the Playwright page object. Storing it once in <code>__init__</code> means you never need to pass it again."
+  },
+  {
+    question: "What does <code>-> str</code> mean in a Python function signature?",
+    options: [
+      "It forces the function to return a string or it throws an error",
+      "It is a type hint that documents the expected return type — Python does not enforce it at runtime",
+      "It converts the return value to a string automatically",
+      "It is a comment syntax specific to pytest"
+    ],
+    answer: 1,
+    explanation: "<strong>-> str</strong> is a <strong>return type hint</strong>. It tells developers (and IDEs) what type the function is expected to return. Python does <em>not</em> enforce it at runtime — the code runs the same with or without it. It improves readability and allows IDEs to warn you if you accidentally return the wrong type."
+  },
+  {
+    question: "What is the role of <code>@pytest.mark.parametrize</code> in <code>test_invalid_login</code>?",
+    options: [
+      "It marks the test to be skipped",
+      "It runs the same test multiple times with different input data, one run per tuple",
+      "It generates random test data automatically",
+      "It connects the test to the users.json file"
+    ],
+    answer: 1,
+    explanation: "<strong>@pytest.mark.parametrize</strong> is a decorator that turns one test function into multiple test runs — one per data set. In <code>test_invalid_login</code>, it provides 4 tuples (wrong user, wrong password, empty username, empty password), so pytest runs the test 4 times with different inputs. This is called <strong>data-driven testing</strong>."
+  },
+  {
+    question: "Why does each test get a fresh <code>page</code> fixture instead of reusing the same tab?",
+    options: [
+      "Because Playwright can only have one tab open at a time",
+      "To guarantee full isolation — cookies, storage, and state are reset between tests so they don't affect each other",
+      "Because the browser fixture has session scope",
+      "Because pytest closes the browser between every test"
+    ],
+    answer: 1,
+    explanation: "The <code>page</code> fixture has <strong>function scope</strong> (the default), meaning a new browser tab is created before each test and closed after. This guarantees <strong>test isolation</strong> — leftover cookies, login sessions, or local storage from one test cannot pollute the next. The browser itself is reused (session scope), only the tab is fresh."
+  },
+  {
+    question: "What does <code>PLAYWRIGHT_BROWSER_PATH</code> control and where is it defined?",
+    options: [
+      "It is defined in pytest.ini and controls which test files to run",
+      "It is defined in conftest.py and stores the SauceDemo URL",
+      "It is an OS environment variable set on your local machine that points Playwright to a system browser like Brave",
+      "It is a Playwright built-in variable that sets the download folder for browsers"
+    ],
+    answer: 2,
+    explanation: "<strong>PLAYWRIGHT_BROWSER_PATH</strong> is an <strong>environment variable</strong> — it lives on the operating system, not in the code. Locally on Ubuntu 26.04, it is set to <code>/usr/bin/brave-browser</code> to work around the fact that Playwright's bundled Chromium is not yet supported on that OS. In CI (GitHub Actions) it is not set, so Playwright falls back to its own bundled Chromium."
+  },
+  {
+    question: "What happens in Python when indentation is inconsistent?",
+    options: [
+      "Python ignores extra spaces and runs the code anyway",
+      "Python throws an IndentationError and refuses to run the code",
+      "The test is skipped automatically",
+      "pytest catches the error and marks the test as failed"
+    ],
+    answer: 1,
+    explanation: "Python uses <strong>indentation</strong> to define code blocks instead of brackets like Java or C#. This is not optional style — it is the actual syntax. If indentation is inconsistent, Python throws an <strong>IndentationError</strong> before executing a single line. A function ends when the indentation returns to the previous level."
+  }
+];
+
+let answered = [];
+let submitted = false;
+
+function buildQuiz() {
+  const container = document.getElementById('quizContainer');
+  container.innerHTML = '';
+  answered = new Array(questions.length).fill(null);
+  updateProgress();
+
+  questions.forEach((q, qi) => {
+    const card = document.createElement('div');
+    card.className = 'question-card';
+    card.id = `card-${qi}`;
+
+    const num = document.createElement('div');
+    num.className = 'question-number';
+    num.textContent = `Question ${qi + 1} of ${questions.length}`;
+
+    const icon = document.createElement('span');
+    icon.className = 'result-icon';
+    icon.id = `icon-${qi}`;
+    num.appendChild(icon);
+
+    const text = document.createElement('div');
+    text.className = 'question-text';
+    text.innerHTML = q.question;
+
+    card.appendChild(num);
+
+    if (q.code) {
+      const codeBlock = document.createElement('div');
+      codeBlock.className = 'code-block';
+      codeBlock.textContent = q.code;
+      card.appendChild(codeBlock);
+    }
+
+    card.appendChild(text);
+
+    const opts = document.createElement('div');
+    opts.className = 'options';
+
+    q.options.forEach((opt, oi) => {
+      const btn = document.createElement('button');
+      btn.className = 'option';
+      btn.innerHTML = opt;
+      btn.dataset.qi = qi;
+      btn.dataset.oi = oi;
+      btn.onclick = () => selectOption(qi, oi);
+      opts.appendChild(btn);
+    });
+
+    card.appendChild(opts);
+
+    const expl = document.createElement('div');
+    expl.className = 'explanation';
+    expl.id = `expl-${qi}`;
+    expl.innerHTML = q.explanation;
+    card.appendChild(expl);
+
+    container.appendChild(card);
+  });
+}
+
+function selectOption(qi, oi) {
+  if (submitted) return;
+  answered[qi] = oi;
+
+  const card = document.getElementById(`card-${qi}`);
+  const buttons = card.querySelectorAll('.option');
+  buttons.forEach((btn, idx) => {
+    btn.classList.remove('selected');
+    if (idx === oi) btn.classList.add('selected');
+  });
+
+  updateProgress();
+  checkAllAnswered();
+}
+
+function updateProgress() {
+  const done = answered.filter(a => a !== null).length;
+  const pct = (done / questions.length) * 100;
+  document.getElementById('progressBar').style.width = pct + '%';
+}
+
+function checkAllAnswered() {
+  const allDone = answered.every(a => a !== null);
+  document.getElementById('submitBtn').disabled = !allDone;
+}
+
+function submitQuiz() {
+  if (submitted) return;
+  submitted = true;
+
+  document.getElementById('submitBtn').disabled = true;
+  document.getElementById('resetBtn').style.display = 'inline-block';
+
+  let correct = 0;
+
+  questions.forEach((q, qi) => {
+    const card = document.getElementById(`card-${qi}`);
+    const buttons = card.querySelectorAll('.option');
+    const icon = document.getElementById(`icon-${qi}`);
+    const expl = document.getElementById(`expl-${qi}`);
+    const userAnswer = answered[qi];
+
+    buttons.forEach((btn, idx) => {
+      btn.disabled = true;
+      btn.classList.remove('selected');
+
+      if (idx === q.answer) {
+        btn.classList.add('correct');
+      }
+      if (idx === userAnswer && userAnswer !== q.answer) {
+        btn.classList.add('wrong');
+      }
+    });
+
+    expl.classList.add('show');
+
+    if (userAnswer === q.answer) {
+      correct++;
+      card.classList.add('correct');
+      icon.textContent = '✅';
+    } else {
+      card.classList.add('wrong');
+      icon.textContent = '❌';
+    }
+    icon.classList.add('show');
+  });
+
+  showScore(correct);
+  document.getElementById('scoreBoard').scrollIntoView({ behavior: 'smooth' });
+}
+
+function showScore(correct) {
+  const total = questions.length;
+  const wrong = total - correct;
+  const pct = Math.round((correct / total) * 100);
+
+  const board = document.getElementById('scoreBoard');
+  const num = document.getElementById('scoreNumber');
+  const msg = document.getElementById('scoreMessage');
+
+  document.getElementById('correctCount').textContent = correct;
+  document.getElementById('wrongCount').textContent = wrong;
+  document.getElementById('totalCount').textContent = total;
+
+  num.textContent = pct + '%';
+
+  if (pct >= 80) {
+    num.className = 'score-number great';
+    msg.textContent = '🎉 Excellent! You have a solid grasp of Phase 1 concepts.';
+  } else if (pct >= 50) {
+    num.className = 'score-number ok';
+    msg.textContent = '📖 Good effort. Review the explanations for the questions you missed.';
+  } else {
+    num.className = 'score-number poor';
+    msg.textContent = '🔁 Keep studying. Read the explanations carefully and try again.';
+  }
+
+  board.classList.add('show');
+}
+
+function resetQuiz() {
+  submitted = false;
+  document.getElementById('scoreBoard').classList.remove('show');
+  document.getElementById('resetBtn').style.display = 'none';
+  document.getElementById('submitBtn').disabled = true;
+  buildQuiz();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+buildQuiz();
+</script>
+</body>
+</html>

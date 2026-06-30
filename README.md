@@ -122,6 +122,8 @@ qa-hiberus-lab/
 │   └── test_api.py             # REST API tests using requests library
 ├── data/
 │   └── users.json              # Test user data for data-driven tests
+├── Quiz/
+│   └── Phase1.html             # Interactive HTML quiz for Phase 1 concepts
 ├── conftest.py                 # Shared pytest fixtures (browser, page, base_url)
 ├── pytest.ini                  # pytest configuration
 ├── requirements.txt            # All Python dependencies with pinned versions
